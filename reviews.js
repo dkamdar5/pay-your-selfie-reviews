@@ -1,7 +1,15 @@
 $(document).ready(function() {
+
+    // get average user review
+    $.get("https://itunes.apple.com/lookup?id=938806572", function(data){
+	var avgRating = data.results[0].averageUserRating;
+	$("#ios-avg-rating").html(avgRating);
+    }, "jsonp");  // using jsonp to solve CORS issue
+
+    // get individual user reviews
     $.get("https://itunes.apple.com/rss/customerreviews/id=938806572/json", function(data){
-	// ignore first
-	for (i=1; i < data.feed.entry.length; i++) {
+	// ignore first, stop at 2 because we only need to retrieve the latest review.
+	for (i=1; i < 2; i++) {
 	    // create variables for the values retrieved
 	    var entry = data.feed.entry[i];
 	    var author = entry.author.name.label;
@@ -9,16 +17,11 @@ $(document).ready(function() {
 	    var rating = entry["im:rating"].label;
 	    var title = entry.title.label;
 
-	    $review = $("div.review").first().clone();  // clone
-
 	    // assign values
-	    $review.find(".author").html(author);
-	    $review.find(".review").html(review);
-	    $review.find(".rating").html(rating);
-	    $review.find(".title").html(title);
-
-	    $review.appendTo("#results");  // add to results
+	    $("#ios-author").html(author);
+	    $("#ios-rating").html(rating);
+	    $("#ios-review-full").html(review);
+	    $("#ios-review-title").html(title);
 	}
-	$("div.review").first().css("display", "none");  // hide template div
     }, "json");  // specify format
 });
